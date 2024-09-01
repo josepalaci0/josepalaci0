@@ -1,0 +1,16 @@
+{
+  "name": "josepalaci0",
+  "version": "1.0.0",
+  "description": "Hi ![](https://user-images.githubusercontent.com/18350557/176309783-0785949b-9127-417c-8b55-ab5a4333674e.gif)My name is Jose Palacio\r ====================================================================================================================================",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cloudflare": "^3.5.0",
+    "wrangler": "^3.73.0"
+  }
+}
