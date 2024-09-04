@@ -1,121 +1,115 @@
+import { generateUUID, hashPassword, verifyPassword } from './utils.js';
+
 export default {
-	async fetch(request, env, ctx) {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    const { pathname } = url;
 
-		// Definir una clase "DataInObtained" con métodos GET y SET
-		class DataInObtained {
-
-			// Constructor para inicializar los datos
-			constructor(category_Etl_iD, data_Etl_iD, obtained_Etl_iD) {
-				this._category_Etl_iD = category_Etl_iD;
-				this._data_Etl_iD = data_Etl_iD;
-				this._obtained_Etl_iD = obtained_Etl_iD;
-			}
-
-			// Métodos GET para acceder a los datos
-			get category_Etl_iD() {
-				return this._category_Etl_iD;
-			}
-
-			get data_Etl_iD() {
-				return this._data_Etl_iD;
-			}
-
-			get obtained_Etl_iD() {
-				return this._obtained_Etl_iD;
-			}
-
-			// Métodos SET para modificar los datos
-			set category_Etl_iD(newCategoryID) {
-				this._category_Etl_iD = newCategoryID;
-			}
-
-			set data_Etl_iD(newDataID) {
-				this._data_Etl_iD = newDataID;
-			}
-
-			set obtained_Etl_iD(newObtainedID) {
-				this._obtained_Etl_iD = newObtainedID;
-			}
-
-			// Método para obtener todos los datos como un objeto
-			getAllData() {
-				return [
-					{
-						category_Etl_iD: this._category_Etl_iD,
-						data_Etl_iD: this._data_Etl_iD,
-						obtained_Etl_iD: this._obtained_Etl_iD
-					}
-				]
-			}
-
-			// Método para modificar múltiples datos al mismo tiempo
-			updateData(newCategoryID, newDataID, newObtainedID) {
-				this.category_Etl_iD = newCategoryID;
-				this.data_Etl_iD = newDataID;
-				this.obtained_Etl_iD = newObtainedID;
-			}
-		}
-
-		// Crear instancias de objetos "DataInObtained"
-		const _Linkedin = new DataInObtained(
-			"5f4e4fg96e4fg4e9e", 
-			"5f4e4fg96e4fg4e9e", 
-			"5f4e4fg96e4fg4e9e"
-		);
-
-		const _Computranajo = new DataInObtained(
-			"5f4e4fg96e4fg4e9e", 
-			"5f4e4fg96e4fg4e9e", 
-			"5f4e4fg96e4fg4e9e"
-		);
-
-		// Modificar datos de _Linkedin usando los métodos SET
-		_Linkedin.category_Etl_iD = "newCategoryID_Linkedin";
-		_Linkedin.data_Etl_iD = "newDataID_Linkedin";
-		_Linkedin.obtained_Etl_iD = "newObtainedID_Linkedin";
-
-		// Modificar datos de _Computranajo usando el método updateData
-		_Computranajo.updateData(
-			"newCategoryID_Computranajo",
-			"newDataID_Computranajo",
-			"newObtainedID_Computranajo"
-		);
-
-		// Combinar los datos de ambas instancias
-		const combinedData = {
-			LinkedinData: _Linkedin.getAllData(),           // Obtener todos los datos
-			ComputranajoData: _Computranajo.getAllData()    // Obtener todos los datos
-		};
-
-		// Retornar la respuesta con los datos combinados en formato JSON
-		return new Response(JSON.stringify(combinedData), {
-			headers: { "Content-Type": "application/json" }
-		});
-
-	},
+    try {
+      if (pathname === '/api/users' && request.method === 'POST') {
+        return await createUser(request, env);
+      } else if (pathname === '/api/users/login' && request.method === 'POST') {
+        return await loginUser(request, env);
+      } else if (pathname === '/api/users' && request.method === 'GET') {
+        const users = await env.DB.prepare('SELECT id, email FROM user').all();
+        return new Response(JSON.stringify(users), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      } else {
+        return new Response('Not Found', { status: 404 });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      return new Response('Internal Server Error', { status: 500 });
+    }
+  },
 };
 
-
-
 /**
+ * Crea un nuevo usuario en la base de datos.
+ * @param {Request} request - La solicitud HTTP.
+ * @param {Env} env - Las variables de entorno del Worker.
+ * @returns {Promise<Response>} - Una respuesta HTTP.
+ */
+async function createUser(request, env) {
+  const { email, password } = await request.json();
 
-/////////////////////////////////////////////////////////////////////////
-// Crear una clase derivada "Estudiante" que hereda de "Persona"
-class Estudiante extends Persona {
-	constructor(nombre, edad, carrera) {
-		super(nombre, edad); // Llama al constructor de la clase base
-		this.carrera = carrera;
-	}
+  if (!email || !password) {
+    return new Response(JSON.stringify({ error: 'Email and password are required.' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
-	mostrarCarrera() {
-		console.log(`Estoy estudiando ${this.carrera}.`);
-	}
+  // Verifica si el usuario ya existe
+  const existingUser = await env.DB.prepare('SELECT id FROM user WHERE email = ?')
+    .bind(email)
+    .first();
+
+  if (existingUser) {
+    return new Response(JSON.stringify({ error: 'User already exists.' }), {
+      status: 409,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const userId = generateUUID();
+  const { hash, salt } = await hashPassword(password);
+
+  await env.DB.prepare(
+    'INSERT INTO user (id, email, password) VALUES (?, ?, ?)'
+  )
+    .bind(userId, email, `${hash}:${salt}`)
+    .run();
+
+  return new Response(JSON.stringify({ message: 'User created successfully.', id: userId }), {
+    status: 201,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
 
-// Crear una instancia de objeto "Maria" que es una estudiante
-const maria = new Estudiante("Maria", 22, "Ingeniería en Informática");
-
-// Acceder a métodos y propiedades de la instancia
-maria.saludar(); // Output: "Hola, soy Maria y tengo 22 años."
-maria.mostrarCarrera(); // Output: "Estoy estudiando Ingeniería en Informática."
+/**
+ * Autentica a un usuario con email y contraseña.
+ * @param {Request} request - La solicitud HTTP.
+ * @param {Env} env - Las variables de entorno del Worker.
+ * @returns {Promise<Response>} - Una respuesta HTTP.
  */
+async function loginUser(request, env) {
+  const { email, password } = await request.json();
+
+  if (!email || !password) {
+    return new Response(JSON.stringify({ error: 'Email and password are required.' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const user = await env.DB.prepare('SELECT id, password FROM user WHERE email = ?')
+    .bind(email)
+    .first();
+
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Invalid email or password.' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const [storedHash, storedSalt] = user.password.split(':');
+
+  const isValidPassword = await verifyPassword(password, storedHash, storedSalt);
+
+  if (!isValidPassword) {
+    return new Response(JSON.stringify({ error: 'Invalid email or password.' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  return new Response(JSON.stringify({ message: 'Login successful.', id: user.id }), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
