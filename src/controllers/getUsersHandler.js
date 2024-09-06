@@ -2,6 +2,7 @@ import { verifyToken } from '../utils';
 
 // Controlador para obtener la lista de usuarios
 export async function getUsersHandler(request, env) {
+    
     const authHeader = request.headers.get('Authorization');
 
     // Verificar si el encabezado de autorización está presente y es un Bearer token
@@ -16,7 +17,9 @@ export async function getUsersHandler(request, env) {
     const token = authHeader.split(' ')[1];
 
     // Verificar la validez del token
-    const payload = verifyToken(token);
+    const payload =  await verifyToken(token);
+
+    console.log(payload);
 
     if (!payload) {
         return new Response(JSON.stringify({ error: 'Invalid or expired token.' }), {

@@ -86,30 +86,44 @@ export async function generateToken(userId, role) {
   return `${headerBase64}.${payloadBase64}.${signature}`;
 }
 
+// Función verifyToken para verificar si un token es válido
 export async function verifyToken(token) {
-  const secret = 'your-secret-key';
+  const secret = 'your-secret-key'; // Clave secreta para la firma
   const [headerBase64, payloadBase64, signature] = token.split('.');
 
+  // Decodificar el header y el payload
   const header = JSON.parse(atob(headerBase64.replace(/-/g, '+').replace(/_/g, '/')));
   const payload = JSON.parse(atob(payloadBase64.replace(/-/g, '+').replace(/_/g, '/')));
 
-  // Generar la firma esperada usando el mismo método que al generar el token
-  const expectedSignature = crypto.createHmac('sha256', secret)
-      .update(`${headerBase64}.${payloadBase64}`)
-      .digest('base64')
-      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  // Simular la generación de la firma esperada
+  const expectedSignature = await crypto.subtle
+      .digest(
+          'SHA-256',
+          new TextEncoder().encode(`${headerBase64}.${payloadBase64}${secret}`)
+      )
+      .then((hashBuffer) => {
+          return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)))
+              .replace(/\+/g, '-')
+              .replace(/\//g, '_')
+              .replace(/=+$/, '');
+      });
 
   // Verificar si la firma coincide
   if (signature !== expectedSignature) {
-      return null; // Firma no coincide
+      console.log('Firma no coincide');
+      return null;
   }
 
   // Verificar si el token ha expirado
   if (payload.exp < Math.floor(Date.now() / 1000)) {
-      return null; // Token expirado
+      console.log('Token expirado');
+      return null;
   }
+
   // Si todo es correcto, devolver el payload (los datos del token)
+  console.log('Token válido', payload);
   return payload;
 }
+
 
 
