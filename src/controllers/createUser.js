@@ -1,9 +1,9 @@
 import { generateUUID, hashPassword } from '../utils.js';
 
 export async function createUser(request, env) {
-    const { email, password } = await request.json();
-  
-    if (!email || !password) {
+    const { email, password, name } = await request.json();
+  console.log(name);
+    if (!email || !password || !name) {
       return new Response(JSON.stringify({ error: 'Email and password are required.' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -16,7 +16,7 @@ export async function createUser(request, env) {
       .first();
   
     if (existingUser) {
-      return new Response(JSON.stringify({ error: 'User already exists.' }), {
+      return new Response(JSON.stringify({ error: 'User already exists.' ,email}), {
         status: 409,
         headers: { 'Content-Type': 'application/json' },
       });

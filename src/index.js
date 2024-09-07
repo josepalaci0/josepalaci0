@@ -36,6 +36,10 @@ export default {
         response = new Response('Hello, world!', {
           headers: { 'Content-Type': 'text/plain' },
         });
+      } else if (pathname === '/' && request.method === 'POST') {
+
+        response = await createUser(request, env);
+        
       } else if (pathname === '/api/users' && request.method === 'POST') {
         response = await createUser(request, env);
       } else if (pathname === '/api/users/login' && request.method === 'POST') {
