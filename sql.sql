@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS User (
     Email TEXT UNIQUE,                -- Correo electrónico del usuario (debe ser único)
     Password TEXT,                    -- Contraseña del usuario almacenada como hash y salt
     Estado TEXT,                      -- Estado del usuario (Ej: 'Activo', 'Inactivo')
-    UltimoInicioSesion TEXT           -- Fecha y hora del último inicio de sesión
+    StatusSession TEXT                -- status de la sesion del usuario (Ej: 'Activo', 'Inactivo')
 );
 
 -- Tabla Product

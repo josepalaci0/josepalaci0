@@ -43,6 +43,13 @@ export async function loginUser(request, env) {
   
       // Generar un token JWT para el usuario autenticado
       const token = await generateToken(user.UserId, 'user'); // El rol 'user' se usa como predeterminado
+
+    /**
+     * 
+     * 1. Crear un nuevo token JWT con el ID del usuario y el rol 'user'
+     * 2. Devolver una respuesta de éxito con el ID del usuario y el token generado
+     * 
+     */
   
       // Devolver una respuesta de éxito con el ID del usuario y el token generado
       return new Response(JSON.stringify({ message: 'Login successful.', token: token }), {
