@@ -31,7 +31,7 @@ export async function getUsersHandler(request, env) {
     }
 
     // Consultar la base de datos para obtener la lista de usuarios
-    const users = await env.DB.prepare('SELECT UserId, Email FROM User').all();
+    const users = await env.DB.prepare('SELECT UserId, Email, StatusSession FROM User').all();
 
     return new Response(JSON.stringify(users), {
         status: 200,

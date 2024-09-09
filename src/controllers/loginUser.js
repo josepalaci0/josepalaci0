@@ -44,6 +44,17 @@ export async function loginUser(request, env) {
       // Generar un token JWT para el usuario autenticado
       const token = await generateToken(user.UserId, 'user'); // El rol 'user' se usa como predeterminado
 
+      if (token){
+        // statusSession  aqui se va actualizar el campo "StatusSession "de la tabla User, si token es generado correctamente
+        // StatusSession  debe quedar en session iniciada
+        const StatusSession = await env.DB.prepare('update User set StatusSession = ? where UserId = ?')
+        .bind('session iniciada', user.UserId)
+        .run();
+        
+        console.log('StatusSession:', StatusSession);
+        
+      }
+
     /**
      * 
      * 1. Crear un nuevo token JWT con el ID del usuario y el rol 'user'
