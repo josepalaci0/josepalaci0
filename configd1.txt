@@ -1,0 +1,3 @@
+npx wrangler d1 create api_data
+npx wrangler d1 execute api_data --local --file=./sql.sql
+npx wrangler d1 execute api_data --remote --file=./sql.sql

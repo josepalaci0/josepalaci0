@@ -1,12 +1,10 @@
-import { verifyToken } from '../utils';
+// middlewares/authMiddleware.js
+import { verifyToken } from './utils';
 
-
-// Controlador para obtener la lista de usuarios
-export async function getUsersHandler(request, env) {
-    
+export async function authMiddleware(request) {
+    // Verificar si el encabezado de autorización está presente y es un Bearer token
     const authHeader = request.headers.get('Authorization');
 
-    // Verificar si el encabezado de autorización está presente y es un Bearer token
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return new Response(JSON.stringify({ error: 'Unauthorized access. Token is required.' }), {
             status: 401,
@@ -18,10 +16,7 @@ export async function getUsersHandler(request, env) {
     const token = authHeader.split(' ')[1];
 
     // Verificar la validez del token
-    const payload =  await verifyToken(token);
-
-    console.log(payload);    
-    
+    const payload = await verifyToken(token);
 
     if (!payload) {
         return new Response(JSON.stringify({ error: 'Invalid or expired token.' }), {
@@ -30,11 +25,5 @@ export async function getUsersHandler(request, env) {
         });
     }
 
-    // Consultar la base de datos para obtener la lista de usuarios
-    const users = await env.DB.prepare('SELECT id, email FROM user').all();
-
-    return new Response(JSON.stringify(users), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-    });
+    return payload; // Devuelve el payload si la verificación es exitosa
 }

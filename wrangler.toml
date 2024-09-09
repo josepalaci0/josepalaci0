@@ -38,8 +38,8 @@ compatibility_flags = ["nodejs_compat"]
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#d1-databases
  [[d1_databases]]
  binding = "DB"
- database_name = "db_jose-data-json"
- database_id = "20411086-cdd8-487c-b22b-07013e0cb47a"
+ database_name = "api_data"
+ database_id = "3d5ecea1-7ea3-419f-a986-3bb50cbe3464"
 
 # Bind a dispatch namespace. Use Workers for Platforms to deploy serverless functions programmatically on behalf of your customers.
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#dispatch-namespace-bindings-workers-for-platforms

@@ -1,9 +1,9 @@
 import { generateUUID, hashPassword } from '../utils.js';
 
 export async function createUser(request, env) {
-    const { email, password, name } = await request.json();
-  console.log(name);
-    if (!email || !password || !name) {
+    const { email, password } = await request.json();
+  
+    if (!email || !password) {
       return new Response(JSON.stringify({ error: 'Email and password are required.' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -11,7 +11,7 @@ export async function createUser(request, env) {
     }
   
     // Verifica si el usuario ya existe
-    const existingUser = await env.DB.prepare('SELECT id FROM user WHERE email = ?')
+    const existingUser = await env.DB.prepare('SELECT UserId FROM User WHERE Email = ?')
       .bind(email)
       .first();
   
@@ -26,7 +26,7 @@ export async function createUser(request, env) {
     const { hash, salt } = await hashPassword(password);
   
     await env.DB.prepare(
-      'INSERT INTO user (id, email, password) VALUES (?, ?, ?)'
+      'INSERT INTO user (UserId, Email, Password) VALUES (?, ?, ?)'
     )
       .bind(userId, email, `${hash}:${salt}`)
       .run();

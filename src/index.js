@@ -1,6 +1,7 @@
 import { getUsersHandler } from './controllers/getUsersHandler';
 import { createUser } from './controllers/createUser';
 import { loginUser } from './controllers/loginUser';
+import { getDashboard } from './controllers/getByTokenUser';
 
 const addCorsHeaders = (response) => {
   const newHeaders = new Headers(response.headers);
@@ -38,7 +39,7 @@ export default {
         });
       } else if (pathname === '/' && request.method === 'POST') {
 
-        response = await createUser(request, env);
+        response = await getDashboard(request, env);
         
       } else if (pathname === '/api/users' && request.method === 'POST') {
         response = await createUser(request, env);
