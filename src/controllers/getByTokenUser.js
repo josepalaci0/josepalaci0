@@ -10,7 +10,7 @@ export async function getDashboard(request, env) {
     }
 
     // Consultar la base de datos para obtener la información del usuario autenticado
-    const user = await env.DB.prepare('SELECT Email FROM User WHERE UserId = ?').bind(payload.userId).first();
+    const user = await env.DB.prepare('SELECT Email, UserName, StatusSession FROM User WHERE UserId = ?').bind(payload.userId).first();
 
     // Si no se encuentra el usuario, devolver un error
     if (!user) {
@@ -25,3 +25,4 @@ export async function getDashboard(request, env) {
         headers: { 'Content-Type': 'application/json' },
     });
 }
+ 
