@@ -15,7 +15,7 @@ export async function loginUser(request, env) {
       }
   
       // Consultar la base de datos para obtener al usuario por su email
-      const user = await env.DB.prepare('SELECT id, password FROM user WHERE email = ?')
+      const user = await env.DB.prepare('SELECT UserId, Password FROM User WHERE Email = ?')
         .bind(email)
         .first();
   
@@ -28,7 +28,7 @@ export async function loginUser(request, env) {
       }
   
       // Separar el hash de la contraseña almacenada y el salt, si se está utilizando
-      const [storedHash, storedSalt] = user.password.split(':');
+      const [storedHash, storedSalt] = user.Password.split(':');
   
       // Verificar si la contraseña proporcionada es válida
       const isValidPassword = await verifyPassword(password, storedHash, storedSalt);
@@ -42,7 +42,7 @@ export async function loginUser(request, env) {
       }
   
       // Generar un token JWT para el usuario autenticado
-      const token = await generateToken(user.id, 'user'); // El rol 'user' se usa como predeterminado
+      const token = await generateToken(user.UserId, 'user'); // El rol 'user' se usa como predeterminado
   
       // Devolver una respuesta de éxito con el ID del usuario y el token generado
       return new Response(JSON.stringify({ message: 'Login successful.', token: token }), {
