@@ -1,6 +1,7 @@
-import { authMiddleware } from '../middlewares';
+import { authMiddleware } from '../../middlewares';
 
-export async function getDashboard(request, env) {
+// Controlador para autenticar a un usuario
+export async function getLogut(request, env) {
     // Llamar al middleware para la autenticación
     const payload = await authMiddleware(request);
 
@@ -9,8 +10,9 @@ export async function getDashboard(request, env) {
         return payload; // Devuelve la respuesta de error
     }
 
-    // Consultar la base de datos para obtener la información del usuario autenticado
-    const user = await env.DB.prepare('SELECT Email, UserName, StatusSession FROM User WHERE UserId = ?').bind(payload.userId).first();
+    const user = await env.DB.prepare('update User set StatusSession = ? where UserId = ?')
+        .bind(null,payload.userId)
+        .run();
 
     // Si no se encuentra el usuario, devolver un error
     if (!user) {
@@ -19,10 +21,9 @@ export async function getDashboard(request, env) {
             headers: { 'Content-Type': 'application/json' },
         });
     }
-
-    return new Response(JSON.stringify(user), {
+    return new Response(JSON.stringify({logout:"Logout successful"}), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
     });
+
 }
- 

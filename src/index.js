@@ -1,7 +1,10 @@
-import { getUsersHandler } from './controllers/getUsersHandler';
-import { createUser } from './controllers/createUser';
-import { loginUser } from './controllers/loginUser';
-import { getDashboard } from './controllers/getByTokenUser';
+import { getUsersHandler } from './controllers/users/getUsersHandler';
+import { createUser } from './controllers/users/createUser';
+import { loginUser } from './controllers/users/loginUser';
+import { getDashboard } from './controllers/users/getByTokenUser';
+import { getLogut } from './controllers/users/getLogout';
+import { createProduct } from './controllers/products/createProduct';
+import { createCustomerOrder } from './controllers/customerOrder/createCustomerOrder';
 
 const addCorsHeaders = (response) => {
   const newHeaders = new Headers(response.headers);
@@ -37,10 +40,19 @@ export default {
         response = new Response('Hello, world!', {
           headers: { 'Content-Type': 'text/plain' },
         });
-      } else if (pathname === '/' && request.method === 'POST') {
+      } else if (pathname === '/logout' && request.method === 'POST') {
 
+        response = await getLogut(request, env);
+
+      }
+      else if (pathname === '/api/users/product' && request.method === 'POST') {
+        response = await createProduct(request, env);
+      } else if (pathname === '/api/users/customerorder' && request.method === 'POST') {
+        response = await createCustomerOrder(request, env);
+
+      }else if (pathname === '/' && request.method === 'POST') {
         response = await getDashboard(request, env);
-        
+
       } else if (pathname === '/api/users' && request.method === 'POST') {
         response = await createUser(request, env);
       } else if (pathname === '/api/users/login' && request.method === 'POST') {

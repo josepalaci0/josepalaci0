@@ -1,4 +1,4 @@
-import { generateUUID, hashPassword } from '../utils.js';
+import { generateUUID, hashPassword } from '../../utils.js';
 
 export async function createUser(request, env) {
     const { email, password } = await request.json();

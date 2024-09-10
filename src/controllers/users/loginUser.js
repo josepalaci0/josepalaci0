@@ -1,4 +1,4 @@
-import { generateToken, verifyPassword } from '../utils.js';
+import { generateToken, verifyPassword } from '../../utils';
 
 // Controlador para autenticar a un usuario
 export async function loginUser(request, env) {
@@ -43,15 +43,13 @@ export async function loginUser(request, env) {
   
       // Generar un token JWT para el usuario autenticado
       const token = await generateToken(user.UserId, 'user'); // El rol 'user' se usa como predeterminado
-
+            
       if (token){
         // statusSession  aqui se va actualizar el campo "StatusSession "de la tabla User, si token es generado correctamente
         // StatusSession  debe quedar en session iniciada
         const StatusSession = await env.DB.prepare('update User set StatusSession = ? where UserId = ?')
-        .bind('session iniciada', user.UserId)
-        .run();
-        
-        console.log('StatusSession:', StatusSession);
+        .bind(token, user.UserId)
+        .run();        
         
       }
 

@@ -1,4 +1,5 @@
 -- Tabla User
+
 DROP TABLE IF EXISTS User;
 CREATE TABLE IF NOT EXISTS User (
     UserId TEXT PRIMARY KEY,          -- Identificador único del usuario
@@ -21,6 +22,7 @@ CREATE TABLE IF NOT EXISTS Product (
 
 -- Tabla CustomerOrder
 DROP TABLE IF EXISTS CustomerOrder;
+
 CREATE TABLE IF NOT EXISTS CustomerOrder (
     OrderId TEXT PRIMARY KEY,         -- Identificador único del pedido
     UserId TEXT,                      -- Identificador del usuario que realizó el pedido
@@ -40,3 +42,4 @@ CREATE TABLE IF NOT EXISTS OrderItem (
     FOREIGN KEY (OrderId) REFERENCES CustomerOrder(OrderId),  -- Relación con la tabla CustomerOrder
     FOREIGN KEY (ProductId) REFERENCES Product(ProductId)  -- Relación con la tabla Product
 );
+
